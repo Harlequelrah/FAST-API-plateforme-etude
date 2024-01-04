@@ -102,13 +102,122 @@ def get_inscription_from_date(db:Session,date:date):
 
 
 
-# def get_professeur(db:Session,id_Prof:int):
-#     return db.query(models.Professeur).filter(models.Professeur.id_Prof==id_Prof).first()
-
-# def get_module(db:Session,id_Module:int):
-#     return db.query(models.Module).filter(models.Module.id_Module==id_Module).first()
-
-# def get_cours(db:Session,id_Cours:int):
-#     return db.query(models.Cours).filter(models.Cours.id_Cours==id_Cours).first()
+def get_professeur(db:Session,id_Prof:int):
+    return db.query(models.Professeur).filter(models.Professeur.id_Prof==id_Prof).first()
 
 
+def get_module(db:Session,id_Module:int):
+     return db.query(models.Module).filter(models.Module.id_Module==id_Module).first()
+
+
+def get_cours(db:Session,id_Cours:int):
+     return db.query(models.Cours).filter(models.Cours.id_Cours==id_Cours).first()
+
+
+def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
+
+    fake_hashed_password = etudiant.mot_de_passe + "notreallyhashed"
+
+    # Création d'une instance de l'étudiant avec le mot de passe hashé
+    db_etudiant = models.Etudiant(
+        nom_Etud=etudiant.nom_Etud,
+        prenom_Etud=etudiant.prenom_Etud,
+        email_Etud=etudiant.email_Etud,
+        date_Naissance=etudiant.date_Naissance,
+        universite_Provenance=etudiant.universite_Provenance,
+        mot_de_passe=fake_hashed_password
+    )
+
+    # Ajout de l'étudiant à la session de base de données
+    db.add(db_etudiant)
+
+    # Validation des modifications dans la base de données
+    db.commit()
+
+    # Actualisation de l'objet étudiant pour refléter les éventuelles modifications dans la base de données
+    db.refresh(db_etudiant)
+
+    # Retourne l'objet étudiant créé
+    return db_etudiant
+
+def create_cours(db: Session, cours: schemas.CoursCreate):
+    # Création d'une instance de cours
+    db_cours = models.Cours(
+        nom_Cours=cours.nom_Cours,
+        libelle_Cours=cours.libelle_Cours,
+        contenue=cours.contenue
+    )
+
+
+    db.add(db_cours)
+
+
+    db.commit()
+
+
+    db.refresh(db_cours)
+
+
+    return db_cours
+
+
+def create_inscription(db: Session, inscription: schemas.InscriptionCreate):
+    db_inscription = models.Inscription(
+        id_Session=inscription.id_Session,
+        date_Inscription=inscription.date_Inscription,
+        status=inscription.status,
+        id_Etud=inscription.id_Etud,
+        id_Cours=inscription.id_Cours
+    )
+    db.add(db_inscription)
+    db.commit()
+    db.refresh(db_inscription)
+    return db_inscription
+
+
+def create_professeur(db: Session, professeur: schemas.ProfesseurCreate):
+    db_professeur = models.Professeur(
+        nom_Prof=professeur.nom_Prof,
+        prenom_Prof=professeur.prenom_Prof,
+        email_Prof=professeur.email_Prof
+    )
+    db.add(db_professeur)
+    db.commit()
+    db.refresh(db_professeur)
+    return db_professeur
+
+
+def create_enseigner(db: Session, enseigner: schemas.EnseignerCreate):
+    db_enseigner = models.Enseigner(
+        session_Debut=enseigner.session_Debut,
+        session_Fin=enseigner.session_Fin,
+        volume_Horaire=enseigner.volume_Horaire,
+        id_Prof=enseigner.id_Prof,
+        id_Cours=enseigner.id_Cours
+    )
+    db.add(db_enseigner)
+    db.commit()
+    db.refresh(db_enseigner)
+    return db_enseigner
+
+
+def create_module(db: Session, module: schemas.ModuleCreate):
+    db_module = models.Module(
+        nom_Module=module.nom_Module,
+        libelle_Module=module.libelle_Module
+    )
+    db.add(db_module)
+    db.commit()
+    db.refresh(db_module)
+    return db_module
+
+
+def create_contenir(db: Session, contenir: schemas.ContenirCreate):
+    db_contenir = models.Contenir(
+        id_Cours=contenir.id_Cours,
+        id_Module=contenir.id_Module
+    )
+    db.add(db_contenir)
+    db.commit()
+    db.refresh(db_contenir)
+    return db_contenir
