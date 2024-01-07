@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from . import models, schemas
 from typing import List,Tuple
 from datetime import date
+from enum import Enum
 
 #retourne un etudiant a partir de son identifiant
 def get_etudiant(db:Session,id_Etud:int):
@@ -83,7 +84,7 @@ def get_cours_statuts_inscription(db:Session,id_Cours:int):
     return resultats
 
 #renvoie des informations sur les etudiant et leurs  statuts d inscription à un cours en specifiant un statut
-def get_cours_statut_inscription(db:Session,id_Cours:int,statut:Tuple(str,str)):
+def get_cours_statut_inscription(db:Session,id_Cours:int,statut:str):
     E=aliased(models.Etudiant)
     resultats=(
         db.query(E.id_Etud,E.nom_Etud,E.prenom_Etud,models.Inscription.Status,models.Cours.id_Cours,models.Cours.nom_Cours)

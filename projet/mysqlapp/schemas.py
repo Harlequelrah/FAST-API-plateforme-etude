@@ -37,7 +37,7 @@ class Cours(CoursBase):
     class Config:
         orm_mode = True
 
-class InscriptionStatus(Tuple(str,str),Enum):
+class InscriptionStatus(Enum):
     en_cours=("EN_COURS","en_cours")
     en_attente=("EN_ATTENTE","en_cours")
     validee=("Validee","validee")
@@ -80,18 +80,19 @@ class EnseignerBase(BaseModel):
     session_Debut: date
     session_Fin: date
     volume_Horaire: time
-    @validator ("session_Debut", pre=True)
-    def validate_session_Debut(self, value):
+
+    @validator("session_Debut", pre=True, always=True)
+    def validate_session_Debut(cls, value):
         if value <= date.today():
             raise ValueError("La date de début de session doit être ultérieure à la date actuelle")
         return value
-    @validator("session_Debut", "session_Fin", each_item=True)
-    def validate_sessions(cls, value):
 
-        if "session_Debut" in cls.__annotations__ and "session_Fin" in cls.__annotations__:
-            if cls.__annotations__["session_Debut"] > cls.__annotations__["session_Fin"]:
-                raise ValueError("La date de début de session doit être antérieure à la date de fin")
-        return value
+    @validator("session_Debut", "session_Fin", pre=True, always=True)
+    def validate_sessions(cls, values):
+        session_Debut, session_Fin = values.get("session_Debut"), values.get("session_Fin")
+        if session_Debut and session_Fin and session_Debut > session_Fin:
+            raise ValueError("La date de début de session doit être antérieure à la date de fin")
+        return values
 
 class EnseignerCreate(EnseignerBase):
     pass

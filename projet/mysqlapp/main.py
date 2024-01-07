@@ -3,10 +3,13 @@ from sqlalchemy.orm import Session
 from datetime import date
 from . import crud, models, schemas
 from .database import SessionLocal, engine
+import uvicorn
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+# if __name__=="__main__":
+#    uvicorn.run("main:app",host="127.0.0.1",port=8000,reload=True)
 # Dependency
 def get_db():
     db = SessionLocal()
