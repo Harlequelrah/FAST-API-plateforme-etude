@@ -1,11 +1,12 @@
 from typing import List, Optional,Tuple
 from enum import Enum
 from datetime import date,time
-from pydantic import BaseModel,validator
+from pydantic import BaseModel,validator,Field
+
 
 class EtudiantBase(BaseModel):
-    nom_Etud: str
-    prenom_Etud: str
+    nom_Etud: str=Field(examples=['AKIRA'])
+    prenom_Etud: str=Field(examples=['john smith'])
     email_Etud: str
     date_Naissance: date
     universite_Provenance: str
@@ -18,7 +19,8 @@ class Etudiant(EtudiantBase):
     cours: List["Cours"] = []
 
     class Config:
-        orm_mode = True
+        from_orm = True
+
 
 class CoursBase(BaseModel):
     nom_Cours: str
@@ -35,7 +37,7 @@ class Cours(CoursBase):
     modules: List["Module"] = []
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class InscriptionStatus(Enum):
     en_cours=("EN_COURS","en_cours")
@@ -59,7 +61,7 @@ class Inscription(InscriptionBase):
     id_Cours: int
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class ProfesseurBase(BaseModel):
     nom_Prof: str
@@ -74,7 +76,7 @@ class Professeur(ProfesseurBase):
     cours: List[Cours] = []
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class EnseignerBase(BaseModel):
     session_Debut: date
@@ -102,7 +104,7 @@ class Enseigner(EnseignerBase):
     id_Cours: int
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class ModuleBase(BaseModel):
     nom_Module: str
@@ -116,7 +118,7 @@ class Module(ModuleBase):
     cours: List[Cours] = []
 
     class Config:
-        orm_mode = True
+        from_orm = True
 
 class ContenirBase(BaseModel):
     pass
@@ -129,4 +131,4 @@ class Contenir(ContenirBase):
     id_Module: int
 
     class Config:
-        orm_mode = True
+        from_orm = True

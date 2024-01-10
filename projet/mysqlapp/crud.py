@@ -11,7 +11,7 @@ def get_etudiant(db:Session,id_Etud:int):
 
 #retourne un etudiant a partir de son email
 def get_etudiant_by_email(db:Session,email:str):
-    return db.query(models.Etudiant).filter(models.Etudiant.email==email).first()
+    return db.query(models.Etudiant).filter(models.Etudiant.email_Etud==email).first()
 
 #retourne une liste d etudiant
 def get_etudiants(db:Session,skip:int=0,limit:int=None):
