@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from mysqlapp.database import get_db
 from fastapi import APIRouter,Depends, FastAPI, HTTPException
 app_module=APIRouter(
-    prefix='/module',
-    tags=['module']
+    prefix='/modules',
+    tags=['modules']
 )
 
 @app_module.put("/modules/{id_Module}", response_model=schemas.Module)

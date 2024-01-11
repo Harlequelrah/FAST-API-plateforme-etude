@@ -37,11 +37,8 @@ def update_cours(id_Cours: int, cours_update: schemas.CoursCreate, db: Session =
 
 @app_cours.delete("/cours/{id_Cours}", response_model=schemas.Cours)
 def delete_cours(id_Cours: int, db: Session = Depends(get_db)):
-    return crud.delete_cours(db=db, id_Cours=id_Cours)
-
-@app_cours.delete("/cours/{id_Cours}", response_model=schemas.Cours)
-def delete_cours(id_Cours: int, db: Session = Depends(get_db)):
     db_cours = crud.get_cours(db, id_Cours=id_Cours)
+
     if db_cours is None:
         raise HTTPException(status_code=404, detail='Cours non trouvé')
 
