@@ -15,12 +15,18 @@ def get_etudiant_by_email(db:Session,email:str):
 
 #retourne une liste d etudiant
 def get_etudiants(db:Session,skip:int=0,limit:int=None):
-    return db.query(models.Etudiant).offset(skip).limit(limit).order_by(models.Etudiant.nom_Etud).all()
+    return db.query(models.Etudiant).order_by(models.Etudiant.nom_Etud).offset(skip).limit(limit).all()
 
 #retourne le nombre des etudiants
 def get_count_etudiants(db:Session):
      return db.query(func.count(models.Etudiant.id_Etud)).scalar()
 
+def delete_etudiant(db: Session, id_Etud: int):
+    db_etudiant = db.query(models.Etudiant).filter(models.Etudiant.id_Etud == id_Etud).first()
+    if db_etudiant:
+        db.delete(db_etudiant)
+        db.commit()
+    return db_etudiant
 
 #retourne les cours par modules d ' un etudiant
 def get__cours_in_etudiant_per_modules(db: Session, id_Etud: int):

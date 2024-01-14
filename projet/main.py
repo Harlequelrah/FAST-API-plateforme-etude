@@ -27,6 +27,7 @@ app.include_router(app_module)
 app.include_router(app_enseigner)
 app.include_router(app_contenir)
 app.include_router(app_inscription)
+app.mount("/etudiants/static", StaticFiles(directory="PYTHON-PROJECT/projet/static"), name="etudiants_static")
 
 
 if __name__=="__main__":

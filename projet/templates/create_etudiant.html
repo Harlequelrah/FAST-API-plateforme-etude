@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('etudiants_static', path='/create_etudiant.css') }}">
+
+</head>
+
+<body>
+    <form method="post" name="myform" action="/etudiants/etudiants/submit">
+        <div>
+
+                <div>
+                    <label for="Nom">Votre nom :</label>
+                    <input type="text" name="nom" id="Nom" size="20px" value="" placeholder="Entrer votre nom" required />
+                    <!--required-->
+                </div>
+                <div>
+                    <label for="Prenom">Votre prenom :</label>
+                    <input type="text" name="prenom" id="Prenom" size="20px" value="" placeholder="Entrer votre prenom"  required/>
+                    <!--required-->
+                </div>
+                <div>
+                    <label for="Password">Votre mot de passe :</label>
+                    <input type="password" name="password" id="Password"   size=" 20px"  value="" placeholder="Entrer votre mot de passe" />
+
+                </div>
+                <div>
+                    <label for="UP">Votre universite de provenance :</label>
+                    <input type="text" name="universite_provenance" id="Up"   size=" 20px"  value="" placeholder="Entrer votre universite de provenance" />
+
+                </div>
+                <div>
+                    <label for="email">email :</label>
+                    <input type="email" name="email" id="email"   size=" 20px"  value="" placeholder="Entrer votre email" />
+
+                </div>
+
+            <div>
+                <label for="date">Entrer votre date de naissance? :</label>
+                <input type="date" name="date_naissance" id="Time">
+                <!-- <input type="datetime-local" name="" id="" autofocus> -->
+            </div>
+
+
+            <input type="submit" value="Envoyer"  />
+
+        </div>
+    </form>
+
+
+</body>
+
+</html>
