@@ -1,0 +1,8 @@
+projet/__pycache__/
+projet/mysqlapp/__pycache__/
+projet/mysqlapp.db
+projet/Scripts
+projet/alembic.ini
+projet/requirements.txt
+projet/pyvenv.cfg
+.env

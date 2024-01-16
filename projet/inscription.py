@@ -31,3 +31,15 @@ def update_inscription(id_Etud: int, id_Cours: int, inscription_update: schemas.
     db.commit()
     db.refresh(db_inscription)
     return db_inscription
+
+@app_inscription.put("/inscriptions/{id_Etud}/{id_Cours}", response_model=schemas.Inscription)
+def update_inscription(
+    id_Etud: int, id_Cours: int,
+    inscription_update: schemas.InscriptionCreate,
+    db: Session = Depends(get_db)
+):
+    db_inscription = crud.update_inscription(db, id_Etud, id_Cours, inscription_update)
+    if db_inscription is None:
+        raise HTTPException(status_code=404, detail='Inscription non trouvée')
+
+    return db_inscription

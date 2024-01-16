@@ -25,7 +25,8 @@ class Etudiant(EtudiantBase):
 class CoursBase(BaseModel):
     nom_Cours: str
     libelle_Cours: str
-    contenue: bytes
+    contenue_text: Optional[str]  # Pour le texte
+    contenue_binary: Optional[bytes]  # Pour les données binaires
 
 class CoursCreate(CoursBase):
     pass
@@ -69,7 +70,7 @@ class ProfesseurBase(BaseModel):
     email_Prof: str
 
 class ProfesseurCreate(ProfesseurBase):
-    pass
+    password_Prof: str
 
 class Professeur(ProfesseurBase):
     id_Prof: int

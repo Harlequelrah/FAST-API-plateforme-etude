@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 # from . import crud, models, schemas
 from mysqlapp.database import SessionLocal, engine
+from fastapi.templating import Jinja2Templates
 import uvicorn
 app = FastAPI()
 from enseigner import *
@@ -27,9 +28,8 @@ app.include_router(app_module)
 app.include_router(app_enseigner)
 app.include_router(app_contenir)
 app.include_router(app_inscription)
-app.mount("/etudiants/static", StaticFiles(directory="PYTHON-PROJECT/projet/static"), name="etudiants_static")
 
-
+app.mount("/static", StaticFiles(directory="PYTHON-PROJECT/projet/static"), name="static")
 if __name__=="__main__":
    uvicorn.run("main:app",host="127.0.0.1",port=8000,reload=True)
 # Dependency

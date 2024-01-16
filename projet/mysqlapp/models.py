@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean,TEXT, LargeBinary ,Column, Time,ForeignKey, Integer, String,Date
+from sqlalchemy import Boolean,TEXT, LargeBinary ,Column, Time,ForeignKey, Integer, String,Date, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 from .database import Base
@@ -20,7 +20,9 @@ class Cours(Base):
    id_Cours=Column(Integer,primary_key=True,index=True)
    nom_Cours=Column(String(30),nullable=False,index=True)
    libelle_Cours=Column(String(50),nullable=False)
-   contenue=Column(LargeBinary,nullable=False)
+   contenue_text = Column(Text, nullable=True)  # Pour le texte
+   contenue_binary = Column(LargeBinary, nullable=True)  # Pour les données binaires
+
    etudiants=relationship("Etudiant",back_populates="cours",secondary="inscriptions")
    professeurs=relationship("Professeur",back_populates="cours",secondary="enseigner")
    modules=relationship("Module",back_populates="cours",secondary="contenir")
@@ -28,7 +30,7 @@ class Cours(Base):
 
 
 class Inscription(Base):
-    INSCRIPTION_STATUS=(("EN_COURS","en_cours"),("EN_ATTENTE","en_cours"),("Validee","validee"),("Annulee","annulee"))
+    INSCRIPTION_STATUS=(("EN_COURS","en_cours"),("EN_ATTENTE","en_attente"),("Validee","validee"),("Annulee","annulee"))
     __tablename__ = 'inscriptions'
     id_Etud = Column(Integer,ForeignKey("etudiants.id_Etud"),primary_key=True,index=True)
     id_Cours = Column(Integer,ForeignKey("cours.id_Cours"),primary_key=True,index=True)
@@ -43,6 +45,7 @@ class Professeur(Base):
     nom_Prof=Column(String(30),nullable=False)
     prenom_Prof=Column(String(30),nullable=False)
     email_Prof=Column(String(50),unique=True,nullable=False)
+    password_Prof=Column(String(100),nullable=False)
     cours=relationship("Cours",back_populates="professeurs",secondary="enseigner")
 
 class Enseigner(Base):
