@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean,TEXT, LargeBinary ,Column, Time,ForeignKey, Integer, String,Date, Text
+from sqlalchemy import Boolean,TEXT, LargeBinary ,Column, Time,ForeignKey, Integer, String,Date, Text,Sequence
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import ChoiceType
 from .database import Base

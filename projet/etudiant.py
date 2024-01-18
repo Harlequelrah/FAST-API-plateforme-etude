@@ -40,12 +40,13 @@ def  count_etudiant(db:Session=Depends(get_db)):
 
 @app_etudiant.put("/etudiants/update/{id_Etud}", response_model=schemas.Etudiant)
 def update_etudiant(id_Etud: int, etudiant: schemas.EtudiantCreate, db: Session = Depends(get_db)):
-    return crud.update_etudiant(id_Etud,etudiant,db)
+    return crud.update_etudiant(db,etudiant,id_Etud)
 
 
 
 @app_etudiant.delete("/etudiants/delete/{id_Etud}", response_model=schemas.Etudiant)
 def delete_etudiant(id_Etud: int, db: Session = Depends(get_db)):
+   
     return crud.delete_etudiant(db=db, id_Etud=id_Etud)
 
 

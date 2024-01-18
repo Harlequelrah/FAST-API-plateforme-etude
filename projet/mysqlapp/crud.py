@@ -1,11 +1,18 @@
 from sqlalchemy.orm import Session,aliased
 from sqlalchemy.sql import func
 from . import models, schemas
+from sqlalchemy import text
 from typing import List,Tuple
 from datetime import date
 from enum import Enum
 from fastapi import  HTTPException
 
+
+def upid(db,max,id,id_column,table):
+    if max:
+           for i in range(id+1,max+2):
+             db.execute(text(f"update {table} set {id_column}={i-1} where {id_column}={i}"))
+             db.commit()
 
 def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
 
@@ -24,12 +31,14 @@ def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
 
     # Ajout de l'étudiant à la session de base de données
     db.add(db_etudiant)
-
+    max_id = db.query(func.max(models.Etudiant.id_Etud)).scalar()
+    if max_id is not None:db.execute(text(f"ALTER TABLE etudiants AUTO_INCREMENT = {max_id + 1}"))
     # Validation des modifications dans la base de données
     db.commit()
 
     # Actualisation de l'objet étudiant pour refléter les éventuelles modifications dans la base de données
     db.refresh(db_etudiant)
+
 
     # Retourne l'objet étudiant créé
     return db_etudiant
@@ -63,7 +72,10 @@ def delete_etudiant(db: Session, id_Etud: int):
     else :
         db.delete(db_etudiant)
         db.commit()
+        max_etudiants=get_count_etudiants(db)
+        upid(db,max_etudiants,id_Etud,"id_Etud","etudiants")
     return db_etudiant
+
 
 def update_etudiant(db: Session, etudiant: schemas.EtudiantCreate, id_Etud: int):
     db_etudiant = get_etudiant(db, id_Etud)
@@ -121,6 +133,8 @@ def create_professeur(db: Session, professeur: schemas.ProfesseurCreate):
         password_Prof=fake_hashed_password
     )
     db.add(db_professeur)
+    max_id = db.query(func.max(models.Professeur.id_Prof)).scalar()
+    if max_id is not None:db.execute(text(f"ALTER TABLE professeurs AUTO_INCREMENT = {max_id + 1}"))
     db.commit()
     db.refresh(db_professeur)
     return db_professeur
@@ -151,9 +165,13 @@ def get_count_professeurs(db: Session):
 # Fonction pour supprimer un professeur
 def delete_professeur(db: Session, id_Prof: int):
     db_professeur = db.query(models.Professeur).filter(models.Professeur.id_Prof == id_Prof).first()
-    if db_professeur:
+    if db_professeur is None:
+        raise HTTPException(status_code=404, detail='Professeur non trouvé')
+    else:
         db.delete(db_professeur)
         db.commit()
+        max_professeurs=get_count_professeurs(db)
+        upid(db,max_professeurs,id_Prof,"id_Prof","professeurs")
     return db_professeur
 
 # Fonction pour mettre à jour un professeur
@@ -223,7 +241,16 @@ def get_all_cours(db:Session,skip:int=0,limit:int=None):
     return db.query(models.Cours).order_by(models.Cours.nom_Cours).offset(skip).limit(limit).all()
 
 
-
+def delete_cours(db: Session, id_Cours: int):
+    db_cours = db.query(models.Cours).filter(models.Cours.id_Cours == id_Cours).first()
+    if db_cours is None:
+        raise HTTPException(status_code=404, detail='cours non trouvé')
+    else:
+        db.delete(db_cours)
+        db.commit()
+        max_cours=db.query(func.count(models.Cours.id_Cours)).scalar()
+        upid(db,max_cours,id_Cours,"id_Cours","cours")
+    return db_cours
 
 def create_cours(db: Session, cours: schemas.CoursCreate):
     # Création d'une instance de cours
@@ -234,6 +261,8 @@ def create_cours(db: Session, cours: schemas.CoursCreate):
         contenue_binary=cours.contenue_binary
     )
     db.add(db_cours)
+    max_id = db.query(func.max(models.Cours.id_Cours)).scalar()
+    if max_id is not None:db.execute(text(f"ALTER TABLE cours AUTO_INCREMENT = {max_id + 1}"))
     db.commit()
     db.refresh(db_cours)
     return db_cours
@@ -250,32 +279,29 @@ def get_modules_of_cours(db:Session,id_Cours:int):
 
 
 
-#renvoie des informations sur les etudiant et leurs  statuts d inscription à un cours
-def get_cours_statuts_inscription(db:Session,id_Cours:int):
-    E=aliased(models.Etudiant)
-    resultats=(
-        db.query(E.id_Etud,E.nom_Etud,E.prenom_Etud,models.Inscription.Status,models.Cours.id_Cours,models.Cours.nom_Cours)
+def get_cours_statuts_inscription(db: Session, id_Cours: int):
+    E = aliased(models.Etudiant)
+    resultats = (
+        db.query(E.id_Etud, E.nom_Etud, E.prenom_Etud, models.Inscription.Status, models.Cours.id_Cours, models.Cours.nom_Cours)
         .join(models.Inscription)
-        .join(E,E.id_Etud)
-        .join(models.Cours,models.Cours.id_Cours)
-        .filter(models.Inscription.id_Cours==id_Cours)
+        .join(E, E.id_Etud)
+        .join(models.Cours, models.Cours.id_Cours)
+        .filter(models.Inscription.id_Cours == id_Cours)
         .all()
     )
     return resultats
 
-#renvoie des informations sur les etudiant et leurs  statuts d inscription à un cours en specifiant un statut
-def get_cours_statut_inscription(db:Session,id_Cours:int,statut:str):
-    E=aliased(models.Etudiant)
-    resultats=(
-        db.query(E.id_Etud,E.nom_Etud,E.prenom_Etud,models.Inscription.Status,models.Cours.id_Cours,models.Cours.nom_Cours)
+def get_cours_statut_inscription(db: Session, id_Cours: int, statut: str):
+    E = aliased(models.Etudiant)
+    resultats = (
+        db.query(E.id_Etud, E.nom_Etud, E.prenom_Etud, models.Inscription.Status, models.Cours.id_Cours, models.Cours.nom_Cours)
         .join(models.Inscription)
-        .join(E,E.id_Etud)
-        .join(models.Cours,models.Cours.id_Cours)
-        .filter(models.Inscription.id_Cours==id_Cours and models.Inscription.Status in statut)
+        .join(E, E.id_Etud)
+        .join(models.Cours, models.Cours.id_Cours)
+        .filter(models.Inscription.id_Cours == id_Cours, models.Inscription.Status.in_(statut))
         .all()
     )
     return resultats
-
 
 def update_inscription(db: Session, id_Etud: int, id_Cours: int, inscription_update: schemas.InscriptionCreate):
     db_inscription = db.query(models.Inscription).filter(
@@ -289,20 +315,25 @@ def update_inscription(db: Session, id_Etud: int, id_Cours: int, inscription_upd
     # Mise à jour des champs modifiables
     db_inscription.id_Session = inscription_update.id_Session
     db_inscription.date_Inscription = inscription_update.date_Inscription
-    db_inscription.Status = inscription_update.Status
-
+    db_inscription.Status = inscription_update.status
     db.commit()
     db.refresh(db_inscription)
     return db_inscription
 
+def delete_inscription(db: Session, id_Etud: int, id_Cours: int):
+    db_inscription = db.query(models.Inscription).filter(
+        models.Inscription.id_Etud == id_Etud,
+        models.Inscription.id_Cours == id_Cours
+    ).first()
 
+    if db_inscription:
+        db.delete(db_inscription)
+        db.commit()
+        return db_inscription
 
+    return None
 
-
-
-
-#retourne toutes les inscriptions qui ont eu lieu a une date precise
-def get_inscription_from_date(db:Session,date:date):
+def get_inscription_from_date(db: Session, date: date):
     return db.query(models.Inscription).filter(models.Inscription.date_Inscription == date).all()
 
 
@@ -319,10 +350,14 @@ def get_module_by_name(db:Session,nom_Module:int):
      return db.query(models.Module).filter(models.Module.nom_Module==nom_Module).first()
 
 def delete_module(db: Session, id_Module: int):
-    db_module = db.query(models.module).filter(models.module.id_Module == id_Module).first()
-    if db_module:
+    db_module = db.query(models.Module).filter(models.Module.id_Module == id_Module).first()
+    if db_module is None:
+        raise HTTPException(status_code=404, detail='Module non trouvé')
+    else:
         db.delete(db_module)
         db.commit()
+        max_modules=db.query(func.count(models.Module.id_Module)).scalar()
+        upid(db,max_modules,id_Module,"id_Module","modules")
     return db_module
 
 def update_module(db: Session, id_Module: int, module: schemas.ModuleCreate):
@@ -350,6 +385,8 @@ def create_module(db: Session, module: schemas.ModuleCreate):
         libelle_Module=module.libelle_Module
     )
     db.add(db_module)
+    max_id = db.query(func.max(models.Module.id_Module)).scalar()
+    if max_id is not None:db.execute(text(f"ALTER TABLE modules AUTO_INCREMENT = {max_id + 1}"))
     db.commit()
     db.refresh(db_module)
     return db_module
@@ -391,7 +428,17 @@ def create_enseigner(db: Session, enseigner: schemas.EnseignerCreate):
     db.refresh(db_enseigner)
     return db_enseigner
 
+def delete_enseigner(db: Session, id_Prof: int, id_Cours: int):
+    db_enseigner = db.query(models.Enseigner).filter(
+        models.Enseigner.id_Prof == id_Prof, models.Enseigner.id_Cours == id_Cours
+    ).first()
 
+    if db_enseigner:
+        db.delete(db_enseigner)
+        db.commit()
+        return db_enseigner
+    else:
+        return None
 def get_enseigner_by_ids(db: Session, id_Prof: int, id_Cours: int):
     return db.query(models.Contenir).filter(
         models.Enseigner.id_Cours == id_Cours,
@@ -403,21 +450,10 @@ def get_enseigner_by_ids(db: Session, id_Prof: int, id_Cours: int):
 
 
 
-def create_contenir(db: Session, contenir: schemas.ContenirCreate,id_Cours,id_Module):
-    db_contenir = models.Contenir(
-        id_Cours=contenir.id_Cours,
-        id_Module=contenir.id_Module
-    )
-    db.add(db_contenir)
-    db.commit()
-    db.refresh(db_contenir)
-    return db_contenir
 
 def get_contenir_by_ids(db: Session, id_cours: int, id_module: int):
     return db.query(models.Contenir).filter(
         models.Contenir.id_Cours == id_cours,
         models.Contenir.id_Module == id_module
     ).first()
-
-
 
