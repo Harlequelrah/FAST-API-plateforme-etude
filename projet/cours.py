@@ -9,23 +9,23 @@ app_cours=APIRouter(
 
 
 @app_cours.post("/cours/postcours", response_model=schemas.Cours)
-def create_cours(cours: schemas.CoursCreate, db: Session = Depends(get_db)):
+async def   create_cours(cours: schemas.CoursCreate, db: Session = Depends(get_db)):
     return crud.create_cours(db=db, cours=cours)
 
 @app_cours.get("/cours/getcours/{id_Cours}", response_model=schemas.Cours)
-def read_cours(id_Cours: int, db: Session = Depends(get_db)):
+async def   read_cours(id_Cours: int, db: Session = Depends(get_db)):
     db_cours = crud.get_cours(db, id_Cours=id_Cours)
     if db_cours is None:
         raise HTTPException(status_code=404, detail='Cours non trouvé')
     return db_cours
 
 @app_cours.get("/cours/getall",response_model=list[schemas.Cours])
-def read_cours(skip:int=0,limit:int=100,db:Session=Depends(get_db)):
+async def   read_cours(skip:int=0,limit:int=100,db:Session=Depends(get_db)):
     cours=crud.get_all_cours(db,skip=skip,limit=limit)
     return cours
 
 @app_cours.put("/cours/update/{id_Cours}", response_model=schemas.Cours)
-def update_cours(id_Cours: int, cours_update: schemas.CoursUpdate, db: Session = Depends(get_db)):
+async def   update_cours(id_Cours: int, cours_update: schemas.CoursUpdate, db: Session = Depends(get_db)):
     db_cours = crud.get_cours(db, id_Cours=id_Cours)
     if db_cours is None:
         raise HTTPException(status_code=404, detail='Cours non trouvé')
@@ -42,5 +42,5 @@ def update_cours(id_Cours: int, cours_update: schemas.CoursUpdate, db: Session =
 
 
 @app_cours.delete("/cours/delete/{id_Cours}", response_model=schemas.Cours)
-def delete_cours(id_Cours: int, db: Session = Depends(get_db)):
+async def   delete_cours(id_Cours: int, db: Session = Depends(get_db)):
     return crud.delete_cours(db,id_Cours)

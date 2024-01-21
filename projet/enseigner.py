@@ -9,7 +9,7 @@ app_enseigner=APIRouter(
 
 
 @app_enseigner.get("/enseigner/{id_Prof}/{id_Cours}", response_model=schemas.Enseigner)
-def read_enseigner(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
+async def read_enseigner(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
     db_enseigner = crud.get_enseigner_by_ids(db, id_Prof, id_Cours)
     if db_enseigner is None:
         raise HTTPException(status_code=404, detail="Relation d'enseignement non trouvée")
@@ -17,7 +17,7 @@ def read_enseigner(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
 
 
 @app_enseigner.put("/enseigner/{id_Prof}/{id_Cours}", response_model=schemas.Enseigner)
-def update_enseigner_route(
+async def update_enseigner_route(
     id_Prof: int, id_Cours: int, enseigner_update: schemas.EnseignerUpdate, db: Session = Depends(get_db)
 ):
     db_enseigner = crud.get_enseigner_by_ids(db, id_Prof, id_Cours)
@@ -35,7 +35,7 @@ def update_enseigner_route(
 
 
 @app_enseigner.delete("/enseigner/{id_Prof}/{id_Cours}", response_model=schemas.Enseigner)
-def delete_enseigner_route(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
+async def delete_enseigner_route(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
     db_enseigner = crud.get_enseigner_by_ids(db, id_Prof, id_Cours)
     if db_enseigner is None:
         raise HTTPException(status_code=404, detail="Relation d'enseignement non trouvée")
@@ -45,7 +45,7 @@ def delete_enseigner_route(id_Prof: int, id_Cours: int, db: Session = Depends(ge
 
 
 @app_enseigner.post("/enseigner/create", response_model=schemas.Enseigner)
-def create_enseigner_route(enseigner: schemas.EnseignerCreate, db: Session = Depends(get_db)):
+async def  create_enseigner_route(enseigner: schemas.EnseignerCreate, db: Session = Depends(get_db)):
 
     db_cours = crud.get_cours(db, enseigner.id_Cours)
     db_prof = crud.get_prof(db, enseigner.id_Prof)

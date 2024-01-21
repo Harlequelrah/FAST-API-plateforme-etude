@@ -6,18 +6,40 @@ from typing import List,Tuple
 from datetime import date
 from enum import Enum
 from fastapi import  HTTPException
+import bcrypt
 
 
 def upid(db,max,id,id_column,table):
     if max:
-           for i in range(id+1,max+2):
-             db.execute(text(f"update {table} set {id_column}={i-1} where {id_column}={i}"))
-             db.commit()
+        for i in range(id+1,max+2):
+            db.execute(text(f"update {table} set {id_column}={i-1} where {id_column}={i}"))
+            db.commit()
+
+def set_password(password: str):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+def check_password(password:str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'))
+
+def authenticate_user(db: Session, email: str, password: str,user:str):
+    # Récupérez l'utilisateur par e-mail depuis la base de données
+    if user=="etudiant":db_user = crud.get_etudiant_by_email(db, email=email)
+    if user=="professeur":db_user = crud.get_professeur_by_email(db, email=email)
+    # Vérifiez si l'utilisateur existe et si le mot de passe correspond
+    if db_user is None :raise HTTPException(status_code=404,detail ='Utilisateur non trouvé')
+    else:
+        if bcrypt.checkpw(password.encode('utf-8'), db_user.hashed_password.encode('utf-8')):
+            return db_user  # L'utilisateur est authentifié
+        else:raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid  password",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
 
 
-    fake_hashed_password = etudiant.mot_de_passe + "notreallyhashed"
+    hashed_password = set_password(etudiant.mot_de_passe)
 
     # Création d'une instance de l'étudiant avec le mot de passe hashé
     db_etudiant = models.Etudiant(
@@ -26,7 +48,7 @@ def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
         email_Etud=etudiant.email_Etud,
         date_Naissance=etudiant.date_Naissance,
         universite_Provenance=etudiant.universite_Provenance,
-        mot_de_passe=fake_hashed_password
+        mot_de_passe=hashed_password
     )
 
     # Ajout de l'étudiant à la session de base de données
@@ -42,6 +64,11 @@ def create_etudiant(db: Session, etudiant: schemas.EtudiantCreate):
 
     # Retourne l'objet étudiant créé
     return db_etudiant
+
+
+
+
+
 
 #retourne un etudiant a partir de son identifiant
 def get_etudiant(db:Session,id_Etud:int):
@@ -125,12 +152,12 @@ def get_etudiant_statut_inscription_cours(db:Session,id_Etud:int,id_Cours:int):
 
 
 def create_professeur(db: Session, professeur: schemas.ProfesseurCreate):
-    fake_hashed_password = professeur.password_Prof + "notreallyhashed"
+    hashed_password = set_password(professeur.password_Prof)
     db_professeur = models.Professeur(
         nom_Prof=professeur.nom_Prof,
         prenom_Prof=professeur.prenom_Prof,
         email_Prof=professeur.email_Prof,
-        password_Prof=fake_hashed_password
+        password_Prof=hashed_password
     )
     db.add(db_professeur)
     max_id = db.query(func.max(models.Professeur.id_Prof)).scalar()
