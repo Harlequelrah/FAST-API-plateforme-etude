@@ -24,7 +24,7 @@ def read_module( skip:int=0,limit:int=100,db:Session=Depends(get_db)):
     return crud.get_all_modules(db,skip=skip,limit=limit)
 
 @app_module.post("/modules/create",response_model=schemas.Module)
-def create_module(module:schemas.EtudiantCreate,db:Session=Depends(get_db)):
+def create_module(module:schemas.ModuleCreate,db:Session=Depends(get_db)):
     db_module=crud.get_module_by_name(db,nom_Module=module.nom_Module)
     if db_module:
         raise HTTPException(status_code=400,detail="Ce module existe déja")

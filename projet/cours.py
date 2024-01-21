@@ -25,7 +25,7 @@ def read_cours(skip:int=0,limit:int=100,db:Session=Depends(get_db)):
     return cours
 
 @app_cours.put("/cours/update/{id_Cours}", response_model=schemas.Cours)
-def update_cours(id_Cours: int, cours_update: schemas.CoursCreate, db: Session = Depends(get_db)):
+def update_cours(id_Cours: int, cours_update: schemas.CoursUpdate, db: Session = Depends(get_db)):
     db_cours = crud.get_cours(db, id_Cours=id_Cours)
     if db_cours is None:
         raise HTTPException(status_code=404, detail='Cours non trouvé')

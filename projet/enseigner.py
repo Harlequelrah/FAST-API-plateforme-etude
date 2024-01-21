@@ -18,7 +18,7 @@ def read_enseigner(id_Prof: int, id_Cours: int, db: Session = Depends(get_db)):
 
 @app_enseigner.put("/enseigner/{id_Prof}/{id_Cours}", response_model=schemas.Enseigner)
 def update_enseigner_route(
-    id_Prof: int, id_Cours: int, enseigner_update: schemas.EnseignerCreate, db: Session = Depends(get_db)
+    id_Prof: int, id_Cours: int, enseigner_update: schemas.EnseignerUpdate, db: Session = Depends(get_db)
 ):
     db_enseigner = crud.get_enseigner_by_ids(db, id_Prof, id_Cours)
     if db_enseigner is None:

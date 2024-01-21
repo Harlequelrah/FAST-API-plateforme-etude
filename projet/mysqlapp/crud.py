@@ -77,7 +77,7 @@ def delete_etudiant(db: Session, id_Etud: int):
     return db_etudiant
 
 
-def update_etudiant(db: Session, etudiant: schemas.EtudiantCreate, id_Etud: int):
+def update_etudiant(db: Session, etudiant: schemas.EtudiantUpdate, id_Etud: int):
     db_etudiant = get_etudiant(db, id_Etud)
 
     if db_etudiant is None:
@@ -175,7 +175,7 @@ def delete_professeur(db: Session, id_Prof: int):
     return db_professeur
 
 # Fonction pour mettre à jour un professeur
-def update_professeur(db: Session, id_Prof: int, professeur: schemas.ProfesseurCreate):
+def update_professeur(db: Session, id_Prof: int, professeur: schemas.ProfesseurUpdate ):
     db_professeur = db.query(models.Professeur).filter(models.Professeur.id_Prof == id_Prof).first()
 
     if db_professeur is None:
@@ -303,7 +303,7 @@ def get_cours_statut_inscription(db: Session, id_Cours: int, statut: str):
     )
     return resultats
 
-def update_inscription(db: Session, id_Etud: int, id_Cours: int, inscription_update: schemas.InscriptionCreate):
+def update_inscription(db: Session, id_Etud: int, id_Cours: int, inscription_update: schemas.InscriptionUpdate):
     db_inscription = db.query(models.Inscription).filter(
         models.Inscription.id_Etud == id_Etud,
         models.Inscription.id_Cours == id_Cours
@@ -360,19 +360,16 @@ def delete_module(db: Session, id_Module: int):
         upid(db,max_modules,id_Module,"id_Module","modules")
     return db_module
 
-def update_module(db: Session, id_Module: int, module: schemas.ModuleCreate):
+def update_module(db: Session, id_Module: int, module: schemas.ModuleUpdate):
     db_module = db.query(models.Module).filter(models.Module.id_Module == id_Module).first()
 
     if db_module is None:
         raise HTTPException(status_code=404, detail='Professeur non trouvé')
 
-    # Mise à jour des champs du professeur
     if module.nom_Module is not None:
         db_module.nom_Module = module.nom_Module
     if module.libelle_Module is not None:
         db_module.libelle_Module = module.libelle_Module
-
-
     db.commit()
     db.refresh(db_module)
     return db_module

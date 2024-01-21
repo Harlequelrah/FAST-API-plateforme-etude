@@ -16,7 +16,7 @@ def read_contenir(id_Module: int, id_Cours: int, db: Session = Depends(get_db)):
 
      return crud.get_contenir_by_ids(db, id_Module, id_Cours)
 
-@app_contenir.put("/contenir/update/{id_Module}/{id_Cours}", response_model=schemas.Contenir)
+@app_contenir.put("/contenir/update/{id_Module}/{id_Cours}", response_model=schemas.UpdateContenir)
 def update_contenir(id_Module: int, id_Cours: int, db: Session = Depends(get_db)):
     # Vérifier si le cours et le module existent avant de mettre à jour la relation
     db_cours = crud.get_cours(db, id_Cours)

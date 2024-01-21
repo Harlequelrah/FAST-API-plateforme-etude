@@ -6,3 +6,6 @@ projet/alembic.ini
 projet/requirements.txt
 projet/pyvenv.cfg
 .env
+include
+Lib
+
