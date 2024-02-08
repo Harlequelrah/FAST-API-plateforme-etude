@@ -1,6 +1,7 @@
-from mysqlapp import crud,schemas,models
+from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
+from typing import List
 from fastapi import APIRouter,Depends, FastAPI, HTTPException
 app_contenir=APIRouter(
     prefix='/contenir',
@@ -81,5 +82,23 @@ async def   create_contenir(id_Module: int, id_Cours: int,db: Session = Depends(
     db.commit()
     db.refresh(db_contenir)
 
-    return  {"message": "Association contenir ajoutée avec succès"}
+    return schemas.Contenir(**db_contenir.__dict__)
 
+@app_contenir.get("/contenir/read/cours_by/{id_Module}", response_model=List[schemas.Cours])
+def get_cours_in_module( id_Module: int ,db: Session = Depends(get_db)):
+    # id_Module=int(id_Module)
+    # 1. Interroger la base de données pour récupérer les entrées de la table Contenir pour le module spécifique
+    contenir_entries = db.query(models.Contenir).filter(models.Contenir.id_Module == id_Module).all()
+
+    cours_details = []
+
+    # 2. Extraire les identifiants de cours de chaque entrée de la table Contenir
+    for entry in contenir_entries:
+        cours_id = entry.id_Cours
+
+        # 3. Utiliser les identifiants de cours pour récupérer les détails complets de chaque cours
+        cours = db.query(models.Cours).filter(models.Cours.id_Cours == cours_id).first()
+        if cours:
+            cours_details.append(cours)
+
+    return cours_details

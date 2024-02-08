@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session,aliased
+from sqlalchemy.orm import Session,aliased,selectinload
 from sqlalchemy.sql import func
-from . import models, schemas
+from . import  models, schemas
 from sqlalchemy import text
 from typing import List,Tuple
 from datetime import date
 from enum import Enum
-from fastapi import  HTTPException
+from fastapi import  HTTPException,status
 import bcrypt
 
 
@@ -23,8 +23,8 @@ def check_password(password:str) -> bool:
 
 def authenticate_user(db: Session, email: str, password: str,user:str):
     # Récupérez l'utilisateur par e-mail depuis la base de données
-    if user=="etudiant":db_user = crud.get_etudiant_by_email(db, email=email)
-    if user=="professeur":db_user = crud.get_professeur_by_email(db, email=email)
+    if user=="etudiant":db_user =get_etudiant_by_email(db, email=email)
+    if user=="professeur":db_user =get_professeur_by_email(db, email=email)
     # Vérifiez si l'utilisateur existe et si le mot de passe correspond
     if db_user is None :raise HTTPException(status_code=404,detail ='Utilisateur non trouvé')
     else:
@@ -285,7 +285,7 @@ def create_cours(db: Session, cours: schemas.CoursCreate):
         nom_Cours=cours.nom_Cours,
         libelle_Cours=cours.libelle_Cours,
         contenue_text=cours.contenue_text,
-        contenue_binary=cours.contenue_binary
+        urls_contenue=cours.urls_contenue
     )
     db.add(db_cours)
     max_id = db.query(func.max(models.Cours.id_Cours)).scalar()
@@ -303,6 +303,9 @@ def create_cours(db: Session, cours: schemas.CoursCreate):
 def get_modules_of_cours(db:Session,id_Cours:int):
     cours=get_cours(db,id_Cours)
     if cours :return cours.modules
+    else:
+        return []
+
 
 
 
@@ -342,7 +345,7 @@ def update_inscription(db: Session, id_Etud: int, id_Cours: int, inscription_upd
     # Mise à jour des champs modifiables
     db_inscription.id_Session = inscription_update.id_Session
     db_inscription.date_Inscription = inscription_update.date_Inscription
-    db_inscription.Status = inscription_update.status
+    db_inscription.Status = inscription_update.Status
     db.commit()
     db.refresh(db_inscription)
     return db_inscription
@@ -417,8 +420,11 @@ def create_module(db: Session, module: schemas.ModuleCreate):
 
 def get_modules_for_cours(db: Session, id_Cours: int):
     # Requête pour récupérer les modules associés à un cours spécifique
-    modules = db.query(models.Module).join(models.Contenir).filter(models.Contenir.id_Cours == id_Cours).all()
-    return modules
+    # Utilisation de selectinload pour charger les relations sans entraîner de requêtes supplémentaires
+    cours = db.query(models.Cours).options(selectinload(models.Cours.modules)).filter(models.Cours.id_Cours == id_Cours).first()
+    if cours:
+        return cours.modules
+    return None
 
 
 
@@ -426,7 +432,7 @@ def create_inscription(db: Session, inscription: schemas.InscriptionCreate):
     db_inscription = models.Inscription(
         id_Session=inscription.id_Session,
         date_Inscription=inscription.date_Inscription,
-        status=inscription.status,
+        Status=inscription.Status,
         id_Etud=inscription.id_Etud,
         id_Cours=inscription.id_Cours
     )
@@ -481,3 +487,7 @@ def get_contenir_by_ids(db: Session, id_cours: int, id_module: int):
         models.Contenir.id_Module == id_module
     ).first()
 
+def cours_of_modules(db:Session,id_Module:int):
+    return db.query(models.Cours).filter(
+
+    )

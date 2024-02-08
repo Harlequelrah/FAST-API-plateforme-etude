@@ -1,10 +1,11 @@
-from mysqlapp import crud,schemas,models
+from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
 from fastapi import APIRouter,Depends, FastAPI, HTTPException, Request,Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from mysqlapp.models import Professeur
+from projet.mysqlapp.models import Professeur
+from typing import List
 app_professeur=APIRouter(
     prefix='/professeurs',
     tags=['professeurs']
@@ -58,3 +59,11 @@ async def   submit(db:Session=Depends(get_db),nom:str=Form(...),prenom:str=Form(
  if db_professeur:
         raise HTTPException(status_code=400,detail="Ce professeur déja")
  return crud.create_professeur(db=db,professeur=professeur)
+
+
+@app_professeur.get("/professeurs/cours_in_professeurs/{id_Prof}", response_model=List[schemas.ProfesseurBase])
+async def read_professeurs_in_cours(id_Prof: int, db: Session = Depends(get_db)):
+    db_prof = crud.get_professeur(db, id_Prof)
+    if db_prof is None:
+        raise HTTPException(status_code=404, detail='Professeur non trouvé')
+    return  db_prof.cours

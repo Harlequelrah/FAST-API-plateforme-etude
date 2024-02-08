@@ -1,11 +1,12 @@
-from mysqlapp import crud,schemas,models
+from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
 from fastapi import APIRouter,Depends, FastAPI, HTTPException,Request,Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles  import StaticFiles
-from mysqlapp.models import Etudiant
+from projet.mysqlapp.models import Etudiant
+from typing import List
 templates = Jinja2Templates(directory="PYTHON-PROJECT/projet/templates")
 
 
@@ -81,3 +82,13 @@ async def   create_etudiant(etudiant:schemas.EtudiantCreate,db:Session=Depends(g
     return crud.create_etudiant(db=db,etudiant=etudiant)
 
 
+
+
+
+
+
+
+@app_etudiant.get("/etudiants/get_cours_in_etudiant/{id_Etud}", response_model=List[schemas.CoursBase], operation_id="get_cours_in_etudiant")
+async def get_cours_in_etudiant(id_Etud: int, db: Session = Depends(get_db)):
+    etudiant=crud.get_etudiant(db,id_Etud)
+    return etudiant.cours

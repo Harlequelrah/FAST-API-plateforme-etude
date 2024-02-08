@@ -1,25 +1,25 @@
 # from fastapi import FastAPI
 # import uvicorn
 # from user import *
-from mysqlapp import crud, models, schemas
+from projet.mysqlapp import crud, models, schemas
 # app=FastAPI()
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 # from . import crud, models, schemas
-from mysqlapp.database import SessionLocal, engine
+from projet.mysqlapp.database import SessionLocal, engine
 from fastapi.templating import Jinja2Templates
 import uvicorn
 app = FastAPI()
-from enseigner import *
-from contenir import *
-from enseigner import *
-from etudiant import *
-from cours import *
-from professeur import *
-from module import *
-from inscription import *
+from projet.enseigner import *
+from projet.contenir import *
+from projet.enseigner import *
+from projet.etudiant import *
+from projet.cours import *
+from projet.professeur import *
+from projet.module import *
+from projet.inscription import *
 models.Base.metadata.create_all(bind=engine)
 app.include_router(app_etudiant)
 app.include_router(app_cours)

@@ -1,6 +1,6 @@
-from mysqlapp import crud,schemas,models
+from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
 from fastapi import APIRouter,Depends, FastAPI, HTTPException
 app_enseigner=APIRouter(
     prefix='/enseigner',
@@ -48,7 +48,7 @@ async def delete_enseigner_route(id_Prof: int, id_Cours: int, db: Session = Depe
 async def  create_enseigner_route(enseigner: schemas.EnseignerCreate, db: Session = Depends(get_db)):
 
     db_cours = crud.get_cours(db, enseigner.id_Cours)
-    db_prof = crud.get_prof(db, enseigner.id_Prof)
+    db_prof = crud.get_professeur(db, enseigner.id_Prof)
 
     if db_cours is None or db_prof is None:
         raise HTTPException(status_code=404, detail="Cours ou professeur non trouvé")

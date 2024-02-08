@@ -1,13 +1,13 @@
-from mysqlapp import crud,schemas,models
+from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
-from mysqlapp.database import get_db
+from projet.mysqlapp.database import get_db
 from fastapi import APIRouter,Depends, FastAPI, HTTPException
 app_inscription=APIRouter(
     prefix='/inscriptions',
     tags=['inscriptions']
 )
 
-@app_inscription.post("/inscriptions/", response_model=schemas.Inscription)
+@app_inscription.post("/inscriptions/", response_model=schemas.InscriptionCreate)
 async def   create_inscription(inscription: schemas.InscriptionCreate, db: Session = Depends(get_db)):
     return crud.create_inscription(db=db, inscription=inscription)
 
