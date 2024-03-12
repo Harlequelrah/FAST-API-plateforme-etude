@@ -29,7 +29,7 @@ app.include_router(app_enseigner)
 app.include_router(app_contenir)
 app.include_router(app_inscription)
 
-app.mount("/static", StaticFiles(directory="PYTHON-PROJECT/projet/static"), name="static")
+app.mount("/static", StaticFiles(directory="projet/static"), name="static")
 if __name__=="__main__":
    uvicorn.run("main:app",host="127.0.0.1",port=8000,reload=True)
 # Dependency

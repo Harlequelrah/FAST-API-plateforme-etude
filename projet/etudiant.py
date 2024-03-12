@@ -1,12 +1,13 @@
 from projet.mysqlapp import crud,schemas,models
 from sqlalchemy.orm import Session
 from projet.mysqlapp.database import get_db
+from typing import List
 from fastapi import APIRouter,Depends, FastAPI, HTTPException,Request,Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles  import StaticFiles
 from projet.mysqlapp.models import Etudiant
-from typing import List
+
 templates = Jinja2Templates(directory="PYTHON-PROJECT/projet/templates")
 
 

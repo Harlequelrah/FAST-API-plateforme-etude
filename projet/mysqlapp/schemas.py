@@ -26,7 +26,7 @@ class EtudiantUpdate(BaseModel):
     universite_Provenance: Optional[Universite]=None
 
 class EtudiantCreate(EtudiantBase):
-     mot_de_passe: str
+    mot_de_passe: str
 
 class Etudiant(EtudiantBase):
     id_Etud: int

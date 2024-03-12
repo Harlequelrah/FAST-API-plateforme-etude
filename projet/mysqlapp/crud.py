@@ -90,7 +90,7 @@ def get_etudiants(db:Session,skip:int=0,limit:int=None):
 
 #retourne le nombre des etudiants
 def get_count_etudiants(db:Session):
-     return db.query(func.count(models.Etudiant.id_Etud)).scalar()
+    return db.query(func.count(models.Etudiant.id_Etud)).scalar()
 
 def delete_etudiant(db: Session, id_Etud: int):
     db_etudiant = get_etudiant(db, id_Etud)
